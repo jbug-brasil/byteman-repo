@@ -1,0 +1,13 @@
+# This rule will set the Quartz requestRecovery to true to reschedule a trigger when it fails 5+ times
+# https://github.com/droolsjbpm/jbpm/blob/master/jbpm-flow/src/main/java/org/jbpm/process/core/timer/impl/QuartzSchedulerService.java#L155
+# Author Filippe Spolti
+RULE @3 setRequestsRecovery
+CLASS org.jbpm.process.core.timer.impl.QuartzSchedulerService
+METHOD internalSchedule
+AT WRITE $jobq
+IF TRUE
+DO
+        traceln("[BYTEMAN] Currenct Value for requestsRecovery: " + $jobq.requestsRecovery() + " ---------- UPDATING");
+        $jobq.setRequestsRecovery(true);
+        traceln("[BYTEMAN] New value for requestsRecovery: " + $jobq.requestsRecovery());
+ENDRULE

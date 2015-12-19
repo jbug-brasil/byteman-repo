@@ -1,0 +1,14 @@
+# This rule will reset the reset the failedCount variable to force the Trigger to not be unscheduled
+# https://github.com/droolsjbpm/jbpm/blob/master/jbpm-flow/src/main/java/org/jbpm/process/core/timer/impl/QuartzSchedulerService.java#L329
+# Author Filippe Spolti
+
+RULE @2 IgnoreRetryFail
+CLASS org.jbpm.process.core.timer.impl.QuartzSchedulerService$QuartzJob
+METHOD execute
+AT WRITE $failedCount
+IF TRUE
+DO
+        traceln("BYTEMAN - ignoring retry. Retry count:  " + $failedCount );
+        $failedCount = 0;
+ENDRULE
+

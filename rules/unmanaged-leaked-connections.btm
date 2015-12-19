@@ -1,0 +1,77 @@
+# This script used to track connections that are not JCA/CCM managed
+#
+# It uses com.jboss.examples.byteman.DatabaseHelper - you can see the 
+# rules that put / remove when connection are opened / closed.
+# It binds an MBean which you can access in jconsole and invoke a method 
+# to see how many are open, and look for ones which are not closed and see 
+# the stacktrace that opened them:
+# com.jboss.examples.byteman:type=DatabaseHelper
+#
+# The source is in the byteman-helpers.jar
+
+
+
+# Store DataBase connections pulled
+RULE @1 Store DataBase connections pulled
+INTERFACE ^javax.sql.DataSource
+METHOD getConnection
+HELPER com.jboss.examples.byteman.DatabaseHelper
+AT EXIT
+IF TRUE
+DO
+  System.out.println("[BYTEMAN-1] Put database connection " + $!);
+  putDatabaseConnection($!);
+ENDRULE
+
+# Store DataBase connections pulled
+RULE @2 Store DataBase connections pulled
+CLASS ^java.sql.DriverManager
+METHOD getConnection
+HELPER com.jboss.examples.byteman.DatabaseHelper
+AT EXIT
+IF TRUE
+DO
+  System.out.println("[BYTEMAN-2] Put database connection " + $!);
+  putDatabaseConnection($!);
+ENDRULE
+
+
+# Remove Closed DataBase connection - call at the end of the method
+RULE @3 Remove Closed DataBase connection
+INTERFACE ^java.sql.Connection
+METHOD close
+HELPER com.jboss.examples.byteman.DatabaseHelper
+AT EXIT
+IF TRUE
+DO
+  System.out.println("[BYTEMAN-3] Removing database connection " + $0);
+  removeDatabaseConnection($0);
+ENDRULE
+
+# XA Datasources
+
+# Store XA DataBase connections pulled
+RULE @4 Store DataBase connections pulled
+INTERFACE ^javax.sql.XADataSource
+METHOD getXAConnection
+HELPER com.jboss.examples.byteman.DatabaseHelper
+AT ENTRY
+IF TRUE
+DO
+  System.out.println("[BYTEMAN-4] Put XA database connection " + $!);
+  putDatabaseConnection($!);
+ENDRULE
+
+# Remove Closed XA DataBase connection - call at the end of the method
+RULE @5 Remove Closed DataBase connection
+INTERFACE ^javax.sql.XAConnection
+METHOD close
+HELPER com.jboss.examples.byteman.DatabaseHelper
+AT EXIT
+IF TRUE
+DO
+  System.out.println("[BYTEMAN-5] Removing XA database connection " + $0);
+  removeDatabaseConnection($0);
+ENDRULE
+
+

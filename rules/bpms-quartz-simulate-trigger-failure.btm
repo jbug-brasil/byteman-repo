@@ -1,0 +1,11 @@
+# This rule will simulate failure in the Quartz Triggers in the BPMS 6.X
+# Author Martin Weiler
+
+RULE @1 DisposableCommandService.execute
+CLASS org.jbpm.process.core.timer.impl.GlobalTimerService$DisposableCommandService
+METHOD execute
+AT ENTRY
+IF TRUE
+   DO System.out.println("======= BYTEMAN  execute DisposableCommandService =======");
+   throw new java.lang.RuntimeException("Lock owned during cleanup");
+ENDRULE
