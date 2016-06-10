@@ -7,7 +7,7 @@ METHOD internalSchedule
 AT WRITE $jobq
 IF TRUE
 DO
-        traceln("[BYTEMAN] Currenct Value for requestsRecovery: " + $jobq.requestsRecovery() + " ---------- UPDATING");
+        traceln("[BYTEMAN] Current Value for requestsRecovery: " + $jobq.requestsRecovery() + " ---------- UPDATING");
         $jobq.setRequestsRecovery(true);
         traceln("[BYTEMAN] New value for requestsRecovery: " + $jobq.requestsRecovery());
 ENDRULE
