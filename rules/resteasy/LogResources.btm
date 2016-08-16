@@ -1,0 +1,13 @@
+RULE LogResources
+CLASS org.jboss.resteasy.core.ResourceMethodRegistry 
+METHOD addResourceFactory(org.jboss.resteasy.spi.ResourceFactory, String, Class)
+IF TRUE
+DO System.out.println("*** Class  " + $3) 
+ENDRULE
+
+RULE LogResourcesMethod
+CLASS org.jboss.resteasy.core.registry.RootSegment
+METHOD addPath(String, org.jboss.resteasy.core.ResourceInvoker)
+IF TRUE
+DO System.out.println("\t Registered path " + $1) 
+ENDRULE
